@@ -148,8 +148,8 @@ Current implementation includes:
 
 ## 👥 Contributors
 
-Backend System Architecture & Development  
-- progb4atys  
+Core System Design & Security Pipeline Integration
+- val3nt1ne  
 
 Machine Learning Model Development  
 - External Contributor  
