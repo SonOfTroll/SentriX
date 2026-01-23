@@ -149,10 +149,10 @@ Current implementation includes:
 ## 👥 Contributors
 
 Core System Design & Security Pipeline Integration
-- val3nt1ne  
+- val3nt1ne-d4c 
 
 Machine Learning Model Development  
-- External Contributor  
+- 
 
 ---
 
