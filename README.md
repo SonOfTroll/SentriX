@@ -149,7 +149,7 @@ Current implementation includes:
 ## 👥 Contributors
 
 **Core System Design & Security Pipeline Integration**  
-- [val3nt1ne-d4c](https://github.com/val3nt1ne-d4c)
+- [val3nt1n3-d4c](https://github.com/val3nt1n3-d4c)
 
 **Machine Learning Model Development**  
 - [saarthak354](https://github.com/saarthak354)
