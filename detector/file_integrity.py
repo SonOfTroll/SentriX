@@ -12,9 +12,12 @@ BASELINE_FILE = "logs/file_baseline.txt"
 
 def hash_file(path):
     hasher = hashlib.sha256()
-    with open(path, "rb") as f:
-        hasher.update(f.read())
-    return hasher.hexdigest()
+    try:
+        with open(path, "rb") as f:
+            hasher.update(f.read())
+        return hasher.hexdigest()
+    except (PermissionError, FileNotFoundError):
+        return None
 
 
 def initialize_baseline():
@@ -22,8 +25,9 @@ def initialize_baseline():
 
     with open(BASELINE_FILE, "w") as base:
         for file_path in FILES_TO_MONITOR:
-            if os.path.exists(file_path):
-                base.write(f"{file_path}:{hash_file(file_path)}\n")
+            file_hash = hash_file(file_path)
+            if file_hash:
+                base.write(f"{file_path}:{file_hash}\n")
 
 
 def check_files():
@@ -31,7 +35,6 @@ def check_files():
         raise RuntimeError(
             "Baseline not initialized. Run with --init on a clean system."
         )
-
 
     baseline_hashes = {}
     with open(BASELINE_FILE, "r") as base:
@@ -43,22 +46,34 @@ def check_files():
     current_time = int(time.time())
 
     for file_path in FILES_TO_MONITOR:
-        if os.path.exists(file_path):
-            current_hash = hash_file(file_path)
-            baseline_hash = baseline_hashes.get(file_path)
+        current_hash = hash_file(file_path)
 
-            if current_hash != baseline_hash:
-                events.append({
-                    "type": "file",
-                    "path": file_path,
-                    "timestamp": current_time,
+        if not current_hash:
+            continue  #skip unreadable files safely
 
-                    #ML FEATURE HOOK START
-                    "baseline_hash": baseline_hash,
-                    "current_hash": current_hash,
-                    "hash_changed": True
-                    #ML FEATURE HOOK END
-                })
+        baseline_hash = baseline_hashes.get(file_path)
+
+        #detect new file not in baseline
+        if baseline_hash is None:
+            events.append({
+                "type": "file",
+                "path": file_path,
+                "timestamp": current_time,
+                "reason": "File missing from baseline"
+            })
+            continue
+
+        if current_hash != baseline_hash:
+            events.append({
+                "type": "file",
+                "path": file_path,
+                "timestamp": current_time,
+
+                #ML FEATURE HOOK START
+                "baseline_hash": baseline_hash,
+                "current_hash": current_hash,
+                "hash_changed": True
+                #ML FEATURE HOOK END
+            })
 
     return events
-
