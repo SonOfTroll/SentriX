@@ -28,8 +28,10 @@ def initialize_baseline():
 
 def check_files():
     if not os.path.exists(BASELINE_FILE):
-        initialize_baseline()
-        return []
+        raise RuntimeError(
+            "Baseline not initialized. Run with --init on a clean system."
+        )
+
 
     baseline_hashes = {}
     with open(BASELINE_FILE, "r") as base:
@@ -59,3 +61,4 @@ def check_files():
                 })
 
     return events
+
